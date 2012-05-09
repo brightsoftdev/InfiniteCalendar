@@ -37,6 +37,7 @@
 	_month = month;
 	
 	[self sizeToFit];
+	[self setNeedsDisplay];
 }
 
 - (CGFloat)topOffset

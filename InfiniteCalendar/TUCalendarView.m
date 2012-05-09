@@ -18,12 +18,14 @@
 - (BOOL)_firstMonthNeeded;
 - (void)_recenterIfNecessary;
 - (void)_updateMonthViews;
+- (TUMonthView *)_dequeueMonthView;
 
 @end
 
 
 @implementation TUCalendarView {
 	NSMutableArray *_monthViews;
+	NSMutableSet *_monthViewQueue;
 }
 
 - (id)initWithFrame:(CGRect)frame
@@ -53,6 +55,7 @@
 		self.contentSize = CGSizeMake(self.bounds.size.width, 2000.0);
 		
 		_monthViews = [[NSMutableArray alloc] init];
+		_monthViewQueue = [[NSMutableSet alloc] init];
 		
 		
 		TUMonthView *monthView = [[TUMonthView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.frame.size.width, 100.0)];
@@ -114,19 +117,33 @@
 	}
 }
 
+- (TUMonthView *)_dequeueMonthView
+{
+	TUMonthView *monthView = [_monthViewQueue anyObject];
+	
+	if (monthView  == nil) {
+		monthView = [[TUMonthView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.frame.size.width, 100.0)];
+	} else {
+		[_monthViewQueue removeObject:monthView];
+	}
+	
+	return monthView;
+}
+
 - (void)_updateMonthViews
 {
 	[[_monthViews copy] enumerateObjectsUsingBlock:^(TUMonthView *monthView, NSUInteger index, BOOL *stop) {
 		if (!CGRectIntersectsRect(self.bounds, monthView.frame) && _monthViews.count > 1) {
 			[monthView removeFromSuperview];
 			[_monthViews removeObject:monthView];
+			[_monthViewQueue addObject:monthView];
 		}
 	}];
 	
 	while ([self _lastMonthNeeded]) {
 		TUMonthView *lastMonthView = [_monthViews lastObject];
 		
-		TUMonthView *monthView = [[TUMonthView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.frame.size.width, 100.0)];
+		TUMonthView *monthView = [self _dequeueMonthView];
 		NSDateComponents *components = [[NSDateComponents alloc] init];
 		components.month = 1;
 		monthView.month = [[NSCalendar currentCalendar] dateByAddingComponents:components toDate:lastMonthView.month options:0];
@@ -139,10 +156,10 @@
 		[_monthViews addObject:monthView];
 	}
 	
-	if ([self _firstMonthNeeded]) {
+	while ([self _firstMonthNeeded]) {
 		TUMonthView *lastMonthView = [_monthViews objectAtIndex:0];
 		
-		TUMonthView *monthView = [[TUMonthView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.frame.size.width, 100.0)];
+		TUMonthView *monthView = [self _dequeueMonthView];
 		NSDateComponents *components = [[NSDateComponents alloc] init];
 		components.month = -1;
 		monthView.month = [[NSCalendar currentCalendar] dateByAddingComponents:components toDate:lastMonthView.month options:0];
