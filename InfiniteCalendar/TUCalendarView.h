@@ -10,4 +10,7 @@
 
 @interface TUCalendarView : UIScrollView
 
+- (void)scrollToMonth:(NSDate *)month;
+- (void)scrollToMonth:(NSDate *)month animated:(BOOL)animated;
+
 @end

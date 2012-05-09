@@ -9,6 +9,7 @@
 #import "TUCalendarView.h"
 
 #import "TUMonthView.h"
+#import "NSCalendar+TUShortcuts.h"
 
 
 @interface TUCalendarView ()
@@ -54,13 +55,11 @@
 		_monthViews = [[NSMutableArray alloc] init];
 		
 		
-		TUMonthView *lastMonthView = [_monthViews lastObject];
-		
-		TUMonthView *monthView = [[TUMonthView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.bounds.size.width, 100.0)];
+		TUMonthView *monthView = [[TUMonthView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.frame.size.width, 100.0)];
 		monthView.month = [NSDate date];
 		monthView.frame = CGRectMake(0.0,
 									 -1.0,
-									 self.bounds.size.width,
+									 self.frame.size.width,
 									 monthView.frame.size.height);
 		[self addSubview:monthView];
 		
@@ -80,7 +79,7 @@
 		*stop = !lastMonthNeeded;
 	}];
 	
-	return lastMonthNeeded;
+	return lastMonthNeeded && CGRectGetMaxY([[_monthViews lastObject] frame]) < CGRectGetMaxY(self.bounds) + 100.0;
 }
 
 - (BOOL)_firstMonthNeeded
@@ -94,7 +93,7 @@
 		*stop = !firstMonthNeeded;
 	}];
 	
-	return firstMonthNeeded;
+	return firstMonthNeeded && CGRectGetMinY([[_monthViews objectAtIndex:0] frame]) > self.bounds.origin.y - 100.0;
 }
 
 - (void)_recenterIfNecessary
@@ -118,7 +117,7 @@
 - (void)_updateMonthViews
 {
 	[[_monthViews copy] enumerateObjectsUsingBlock:^(TUMonthView *monthView, NSUInteger index, BOOL *stop) {
-		if (!CGRectIntersectsRect(self.bounds, monthView.frame)) {
+		if (!CGRectIntersectsRect(self.bounds, monthView.frame) && _monthViews.count > 1) {
 			[monthView removeFromSuperview];
 			[_monthViews removeObject:monthView];
 		}
@@ -127,13 +126,13 @@
 	while ([self _lastMonthNeeded]) {
 		TUMonthView *lastMonthView = [_monthViews lastObject];
 		
-		TUMonthView *monthView = [[TUMonthView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.bounds.size.width, 100.0)];
+		TUMonthView *monthView = [[TUMonthView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.frame.size.width, 100.0)];
 		NSDateComponents *components = [[NSDateComponents alloc] init];
 		components.month = 1;
 		monthView.month = [[NSCalendar currentCalendar] dateByAddingComponents:components toDate:lastMonthView.month options:0];
 		monthView.frame = CGRectMake(0.0,
 									 lastMonthView.frame.origin.y + lastMonthView.frame.size.height - [monthView topOffset],
-									 self.bounds.size.width,
+									 self.frame.size.width,
 									 monthView.frame.size.height);
 		[self insertSubview:monthView atIndex:0];
 		
@@ -143,13 +142,13 @@
 	if ([self _firstMonthNeeded]) {
 		TUMonthView *lastMonthView = [_monthViews objectAtIndex:0];
 		
-		TUMonthView *monthView = [[TUMonthView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.bounds.size.width, 100.0)];
+		TUMonthView *monthView = [[TUMonthView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.frame.size.width, 100.0)];
 		NSDateComponents *components = [[NSDateComponents alloc] init];
 		components.month = -1;
 		monthView.month = [[NSCalendar currentCalendar] dateByAddingComponents:components toDate:lastMonthView.month options:0];
 		monthView.frame = CGRectMake(0.0,
 									 CGRectGetMinY(lastMonthView.frame) + [lastMonthView topOffset] - monthView.frame.size.height,
-									 self.bounds.size.width,
+									 self.frame.size.width,
 									 monthView.frame.size.height);
 		[self insertSubview:monthView atIndex:0];
 		
@@ -184,6 +183,39 @@
 	
 	[[UIColor lightGrayColor] set];
 	CGContextStrokePath(context);
+}
+
+- (void)scrollToMonth:(NSDate *)month
+{
+	[self scrollToMonth:month animated:NO];
+}
+
+- (void)scrollToMonth:(NSDate *)month animated:(BOOL)animated
+{
+	CGPoint offset = self.contentOffset;
+	TUMonthView *referenceMonthView = [_monthViews lastObject];
+	
+	offset.y =referenceMonthView.frame.origin.y + referenceMonthView.topOffset;
+	
+	NSDate *lastMonth = referenceMonthView.month;
+	NSComparisonResult comparison;
+	while ((comparison = [lastMonth.firstDayOfMonth compare:month.firstDayOfMonth]) != NSOrderedSame) {
+		NSDateComponents *monthMovement = [[NSDateComponents alloc] init];
+		monthMovement.month = (comparison == NSOrderedAscending) ? 1 : -1;
+		NSDate *newMonth = [[NSCalendar currentCalendar] dateByAddingComponents:monthMovement toDate:lastMonth options:0];
+		
+		if (comparison == NSOrderedAscending) {
+			offset.y += [TUMonthView verticalOffsetForWidth:self.frame.size.width month:lastMonth];
+		} else {
+			offset.y -= [TUMonthView verticalOffsetForWidth:self.frame.size.width month:newMonth];
+		}
+		
+		lastMonth = newMonth;
+	}
+	
+	offset.y += [TUMonthView topOffsetForWidth:self.frame.size.width month:month] + 1.0;
+	
+	[self setContentOffset:offset animated:animated];
 }
 
 @end

@@ -15,4 +15,6 @@
 
 @property (strong, nonatomic) IBOutlet TUCalendarView *calendarView;
 
+- (IBAction)showToday:(id)sender;
+
 @end

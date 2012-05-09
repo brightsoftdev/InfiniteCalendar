@@ -13,5 +13,7 @@
 @property (nonatomic) NSDate *month;
 
 - (CGFloat)topOffset;
++ (CGFloat)topOffsetForWidth:(CGFloat)width month:(NSDate *)month;
++ (CGFloat)verticalOffsetForWidth:(CGFloat)widthh month:(NSDate *)month;
 
 @end

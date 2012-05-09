@@ -52,4 +52,9 @@
 	return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad || interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown;
 }
 
+- (IBAction)showToday:(id)sender
+{
+	[self.calendarView scrollToMonth:[NSDate date] animated:YES];
+}
+
 @end

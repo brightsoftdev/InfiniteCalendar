@@ -8,43 +8,11 @@
 
 #import "TUMonthView.h"
 
+#import "NSCalendar+TUShortcuts.h"
+
 
 #define TUMonthLabelWidth 30.0
 #define TUMonthBoundaryLineWidth 1.0
-
-
-
-@implementation NSDate (_TUMonthView)
-
-- (NSDate *)_firstDayOfMonth
-{
-	NSDateComponents *components = [[NSCalendar currentCalendar] components:NSYearCalendarUnit | NSMonthCalendarUnit fromDate:self];
-	return [[NSCalendar currentCalendar] dateFromComponents:components];
-}
-
-- (NSDate *)_lastDayOfMonth
-{
-	NSDateComponents *components = [[NSCalendar currentCalendar] components:NSYearCalendarUnit | NSMonthCalendarUnit fromDate:self];
-	[components setDay:[[NSCalendar currentCalendar] rangeOfUnit:NSDayCalendarUnit inUnit:NSMonthCalendarUnit forDate:self].length];
-	return [[NSCalendar currentCalendar] dateFromComponents:components];
-}
-
-- (NSInteger)_weekday
-{
-	return [[NSCalendar currentCalendar] components:NSWeekdayCalendarUnit fromDate:self].weekday;
-}
-
-@end
-
-@implementation NSCalendar (_TUMonthView)
-
-- (NSInteger)_numberOfDaysInWeek
-{
-	return [self rangeOfUnit:NSWeekdayCalendarUnit inUnit:NSWeekCalendarUnit forDate:[NSDate date]].length;
-}
-
-@end
-
 
 
 @interface TUMonthView ()
@@ -76,14 +44,47 @@
 	return self._topLeftPoint.y;
 }
 
++ (CGFloat)topOffsetForWidth:(CGFloat)width month:(NSDate *)month
+{
+	CGFloat offset = 0.0;
+	
+	CGFloat dayHeight = roundf((width - TUMonthLabelWidth) / [[NSCalendar currentCalendar] numberOfDaysInWeek]);
+	
+	NSInteger firstDayOffset = month.firstDayOfMonth.weekday - [[NSCalendar currentCalendar] firstWeekday];
+	if (firstDayOffset != 0) {
+		offset -= dayHeight;
+	}
+	
+	return offset;
+}
+
++ (CGFloat)verticalOffsetForWidth:(CGFloat)width month:(NSDate *)month
+{
+	CGFloat offset = 0.0;
+	
+	
+	CGFloat dayHeight = roundf((width - TUMonthLabelWidth) / [[NSCalendar currentCalendar] numberOfDaysInWeek]);
+	NSInteger weeks = [[NSCalendar currentCalendar] rangeOfUnit:NSWeekCalendarUnit inUnit:NSMonthCalendarUnit forDate:month].length;
+	offset = dayHeight * weeks;
+	
+	
+	NSInteger firstDayOffset = month.firstDayOfMonth.weekday - [[NSCalendar currentCalendar] firstWeekday];
+	if (firstDayOffset != 0) {
+		offset -= dayHeight;
+	}
+	
+	
+	return offset;
+}
+
 - (CGFloat)_dayHeight
 {
-	return roundf((self.bounds.size.width - TUMonthLabelWidth) / [[NSCalendar currentCalendar] _numberOfDaysInWeek]);
+	return roundf((self.bounds.size.width - TUMonthLabelWidth) / [[NSCalendar currentCalendar] numberOfDaysInWeek]);
 }
 
 - (CGPoint)_topLeftPoint
 {
-	NSInteger firstDayOffset = self.month._firstDayOfMonth._weekday - [[NSCalendar currentCalendar] firstWeekday];
+	NSInteger firstDayOffset = self.month.firstDayOfMonth.weekday - [[NSCalendar currentCalendar] firstWeekday];
 	
 	CGPoint point = CGPointMake(TUMonthLabelWidth, 0.0);
 	if (firstDayOffset != 0) {
@@ -95,10 +96,10 @@
 
 - (CGPoint)_bottomRightPoint
 {
-	NSInteger lastDayOffset = self.month._lastDayOfMonth._weekday - [[NSCalendar currentCalendar] firstWeekday];
+	NSInteger lastDayOffset = self.month.lastDayOfMonth.weekday - [[NSCalendar currentCalendar] firstWeekday];
 	
 	CGPoint point = CGPointMake(self.bounds.size.width, self.bounds.size.height);
-	if (lastDayOffset != [[NSCalendar currentCalendar] _numberOfDaysInWeek] - 1) {
+	if (lastDayOffset != [[NSCalendar currentCalendar] numberOfDaysInWeek] - 1) {
 		point.y -= self._dayHeight;
 	}
 	
@@ -133,7 +134,7 @@
 
 - (CGSize)sizeThatFits:(CGSize)size
 {
-	CGFloat dayHeight = roundf((size.width - TUMonthLabelWidth) / [[NSCalendar currentCalendar] _numberOfDaysInWeek]);
+	CGFloat dayHeight = roundf((size.width - TUMonthLabelWidth) / [[NSCalendar currentCalendar] numberOfDaysInWeek]);
 	NSInteger weeks = [[NSCalendar currentCalendar] rangeOfUnit:NSWeekCalendarUnit inUnit:NSMonthCalendarUnit forDate:self.month].length;
 	
 	size.height = dayHeight * weeks;
@@ -180,8 +181,8 @@
 {
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	
-	NSInteger firstDayOffset = self.month._firstDayOfMonth._weekday - [[NSCalendar currentCalendar] firstWeekday];
-	NSInteger lastDayOffset = self.month._lastDayOfMonth._weekday - [[NSCalendar currentCalendar] firstWeekday];
+	NSInteger firstDayOffset = self.month.firstDayOfMonth.weekday - [[NSCalendar currentCalendar] firstWeekday];
+	NSInteger lastDayOffset = self.month.lastDayOfMonth.weekday - [[NSCalendar currentCalendar] firstWeekday];
 	
 	
 	CGContextMoveToPoint(context, self._topLeftPoint.x,
@@ -211,7 +212,7 @@
 {
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	
-	NSInteger firstDayOffset = self.month._firstDayOfMonth._weekday - [[NSCalendar currentCalendar] firstWeekday];
+	NSInteger firstDayOffset = self.month.firstDayOfMonth.weekday - [[NSCalendar currentCalendar] firstWeekday];
 	
 	
 	CGContextMoveToPoint(context, 0.0,
