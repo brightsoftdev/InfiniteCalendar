@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1129231815587BEA009FEEA9 /* TUMonthView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1129231715587BEA009FEEA9 /* TUMonthView.m */; };
+		1168891C155868AB00CBE4CB /* TUCalendarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1168891B155868AB00CBE4CB /* TUCalendarView.m */; };
 		1175B717155866A300409AD8 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1175B716155866A300409AD8 /* UIKit.framework */; };
 		1175B719155866A300409AD8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1175B718155866A300409AD8 /* Foundation.framework */; };
 		1175B71B155866A300409AD8 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1175B71A155866A300409AD8 /* CoreGraphics.framework */; };
@@ -15,27 +17,28 @@
 		1175B727155866A300409AD8 /* TUAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1175B726155866A300409AD8 /* TUAppDelegate.m */; };
 		1175B729155866A300409AD8 /* InfiniteCalendar.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 1175B728155866A300409AD8 /* InfiniteCalendar.entitlements */; };
 		1175B72C155866A300409AD8 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1175B72A155866A300409AD8 /* MainStoryboard.storyboard */; };
-		1175B72F155866A300409AD8 /* TUMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1175B72E155866A300409AD8 /* TUMasterViewController.m */; };
-		1175B732155866A300409AD8 /* TUDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1175B731155866A300409AD8 /* TUDetailViewController.m */; };
+		1175B73A1558679800409AD8 /* TUCalendarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1175B7391558679800409AD8 /* TUCalendarViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1129231615587BEA009FEEA9 /* TUMonthView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TUMonthView.h; sourceTree = "<group>"; };
+		1129231715587BEA009FEEA9 /* TUMonthView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TUMonthView.m; sourceTree = "<group>"; };
+		1168891A155868AB00CBE4CB /* TUCalendarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TUCalendarView.h; sourceTree = "<group>"; };
+		1168891B155868AB00CBE4CB /* TUCalendarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TUCalendarView.m; sourceTree = "<group>"; };
 		1175B712155866A300409AD8 /* InfiniteCalendar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InfiniteCalendar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1175B716155866A300409AD8 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		1175B718155866A300409AD8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1175B71A155866A300409AD8 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		1175B71E155866A300409AD8 /* InfiniteCalendar-Info.plist */ = {isa = PBXFileReference; path = "InfiniteCalendar-Info.plist"; sourceTree = "<group>"; };
+		1175B71E155866A300409AD8 /* InfiniteCalendar-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "InfiniteCalendar-Info.plist"; sourceTree = "<group>"; };
 		1175B720155866A300409AD8 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1175B722155866A300409AD8 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		1175B724155866A300409AD8 /* InfiniteCalendar-Prefix.pch */ = {isa = PBXFileReference; path = "InfiniteCalendar-Prefix.pch"; sourceTree = "<group>"; };
-		1175B725155866A300409AD8 /* TUAppDelegate.h */ = {isa = PBXFileReference; path = TUAppDelegate.h; sourceTree = "<group>"; };
+		1175B724155866A300409AD8 /* InfiniteCalendar-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "InfiniteCalendar-Prefix.pch"; sourceTree = "<group>"; };
+		1175B725155866A300409AD8 /* TUAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TUAppDelegate.h; sourceTree = "<group>"; };
 		1175B726155866A300409AD8 /* TUAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TUAppDelegate.m; sourceTree = "<group>"; };
 		1175B728155866A300409AD8 /* InfiniteCalendar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = InfiniteCalendar.entitlements; sourceTree = "<group>"; };
 		1175B72B155866A300409AD8 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
-		1175B72D155866A300409AD8 /* TUMasterViewController.h */ = {isa = PBXFileReference; path = TUMasterViewController.h; sourceTree = "<group>"; };
-		1175B72E155866A300409AD8 /* TUMasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TUMasterViewController.m; sourceTree = "<group>"; };
-		1175B730155866A300409AD8 /* TUDetailViewController.h */ = {isa = PBXFileReference; path = TUDetailViewController.h; sourceTree = "<group>"; };
-		1175B731155866A300409AD8 /* TUDetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TUDetailViewController.m; sourceTree = "<group>"; };
+		1175B7381558679800409AD8 /* TUCalendarViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TUCalendarViewController.h; sourceTree = "<group>"; };
+		1175B7391558679800409AD8 /* TUCalendarViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TUCalendarViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +55,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1129231A15587BF6009FEEA9 /* TUCalendar */ = {
+			isa = PBXGroup;
+			children = (
+				1168891A155868AB00CBE4CB /* TUCalendarView.h */,
+				1168891B155868AB00CBE4CB /* TUCalendarView.m */,
+				1129231615587BEA009FEEA9 /* TUMonthView.h */,
+				1129231715587BEA009FEEA9 /* TUMonthView.m */,
+			);
+			name = TUCalendar;
+			sourceTree = "<group>";
+		};
 		1175B707155866A300409AD8 = {
 			isa = PBXGroup;
 			children = (
@@ -85,10 +99,9 @@
 				1175B725155866A300409AD8 /* TUAppDelegate.h */,
 				1175B726155866A300409AD8 /* TUAppDelegate.m */,
 				1175B72A155866A300409AD8 /* MainStoryboard.storyboard */,
-				1175B72D155866A300409AD8 /* TUMasterViewController.h */,
-				1175B72E155866A300409AD8 /* TUMasterViewController.m */,
-				1175B730155866A300409AD8 /* TUDetailViewController.h */,
-				1175B731155866A300409AD8 /* TUDetailViewController.m */,
+				1175B7381558679800409AD8 /* TUCalendarViewController.h */,
+				1175B7391558679800409AD8 /* TUCalendarViewController.m */,
+				1129231A15587BF6009FEEA9 /* TUCalendar */,
 				1175B71D155866A300409AD8 /* Supporting Files */,
 			);
 			path = InfiniteCalendar;
@@ -173,8 +186,9 @@
 			files = (
 				1175B723155866A300409AD8 /* main.m in Sources */,
 				1175B727155866A300409AD8 /* TUAppDelegate.m in Sources */,
-				1175B72F155866A300409AD8 /* TUMasterViewController.m in Sources */,
-				1175B732155866A300409AD8 /* TUDetailViewController.m in Sources */,
+				1175B73A1558679800409AD8 /* TUCalendarViewController.m in Sources */,
+				1168891C155868AB00CBE4CB /* TUCalendarView.m in Sources */,
+				1129231815587BEA009FEEA9 /* TUMonthView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,6 +304,7 @@
 				1175B737155866A300409AD8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

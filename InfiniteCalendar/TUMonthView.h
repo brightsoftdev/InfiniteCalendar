@@ -1,5 +1,5 @@
 //
-//  TUMasterViewController.h
+//  TUMonthView.h
 //  InfiniteCalendar
 //
 //  Created by David Beck on 5/7/12.
@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TUMasterViewController : UITableViewController
+@interface TUMonthView : UIView
+
+@property (nonatomic) NSDate *month;
+
+- (CGFloat)topOffset;
 
 @end
