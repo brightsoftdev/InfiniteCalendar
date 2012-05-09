@@ -198,7 +198,7 @@
 	CGContextAddLineToPoint(context, self._bottomRightPoint.x,
 							self._bottomRightPoint.y);
 	CGContextAddLineToPoint(context, (lastDayOffset + 1) * self._dayHeight + TUMonthLabelWidth,
-							self.bounds.size.height - self._dayHeight);
+							self._bottomRightPoint.y);
 	CGContextAddLineToPoint(context, (lastDayOffset + 1) * self._dayHeight + TUMonthLabelWidth,
 							self.bounds.size.height);
 	CGContextAddLineToPoint(context, TUMonthLabelWidth,
