@@ -14,6 +14,7 @@
 #define TUMonthLabelFont [UIFont boldSystemFontOfSize:16.0]
 #define TUMonthLabelWidth 28.0
 #define TUMonthBoundaryLineWidth 1.0
+#define TUMonthBoundaryLineColor [UIColor darkGrayColor]
 
 
 @interface TUMonthView ()
@@ -222,9 +223,27 @@
 	return pathObject;
 }
 
+- (CGGradientRef)_labelGradient
+{
+	static CGGradientRef gradient = NULL;
+    if (gradient == NULL) {
+        CGFloat colors[8] = { 
+            0.965, 0.965, 0.969, 1.0,
+            0.800, 0.800, 0.820, 1.0};
+        CGFloat locations[2] = { 0.0, 1.0 };
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        gradient = CGGradientCreateWithColorComponents(colorSpace, colors, locations, 2);
+        CGColorSpaceRelease(colorSpace);
+    }
+	
+    return gradient;
+}
+
 - (void)_drawMonthLabel
 {
 	CGContextRef context = UIGraphicsGetCurrentContext();
+	CGContextSaveGState(context);
+	
 	
 	static NSDateFormatter *formatter = nil;
 	if (formatter == nil) {
@@ -234,21 +253,35 @@
 	
 	NSString *monthName = [formatter stringFromDate:self.month];
 	
-	CGContextSaveGState(context);
 	
 	CGContextTranslateCTM(context, 0.0, self.bounds.size.height);
 	CGContextRotateCTM(context, -M_PI_2);
 	
-	[[UIColor colorWithRed:0.0 green:0.0 blue:1.0 alpha:0.5] set];
-	CGRect labelRect = CGRectMake(0.0, 0.0, self.bounds.size.height - self._topLeftPoint.y, TUMonthLabelWidth);
-	CGContextFillRect(context, labelRect);
+	
+	CGRect labelRect = CGRectMake(0.0, 0.0, self.bounds.size.height - self._topLeftPoint.y - TUMonthBoundaryLineWidth, TUMonthLabelWidth);
+	CGContextClipToRect(context, labelRect);
 	
 	
-	[[UIColor yellowColor] set];
+	CGGradientRef gradient = [self _labelGradient];
+    CGPoint startPoint = CGPointMake(CGRectGetMidX(labelRect), CGRectGetMinY(labelRect));
+    CGPoint endPoint = CGPointMake(CGRectGetMidX(labelRect), CGRectGetMaxY(labelRect));
+    CGContextDrawLinearGradient(context, gradient, startPoint, endPoint, 0);
+	
+	
+	CGContextMoveToPoint(context, CGRectGetMinX(labelRect), CGRectGetMaxY(labelRect) - TUMonthBoundaryLineWidth/2.0);
+	CGContextAddLineToPoint(context, CGRectGetMaxX(labelRect), CGRectGetMaxY(labelRect) - TUMonthBoundaryLineWidth/2.0);
+	[[UIColor grayColor] set];
+	CGContextStrokePath(context);
+	
+	
 	CGSize textSize = [monthName sizeWithFont:[UIFont boldSystemFontOfSize:18.0] constrainedToSize:labelRect.size lineBreakMode:UITextAlignmentCenter];
 	CGRect textRect = labelRect;
-	textRect.origin.y = (labelRect.size.height - textSize.height) / 2.0;
 	textRect.size.height = textSize.height;
+	[[UIColor colorWithWhite:1.0 alpha:0.75] set];
+	textRect.origin.y = (labelRect.size.height - textSize.height) / 2.0 + 1.0;
+	[monthName drawInRect:textRect withFont:TUMonthLabelFont lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentCenter];
+	[[UIColor darkGrayColor] set];
+	textRect.origin.y = (labelRect.size.height - textSize.height) / 2.0;
 	[monthName drawInRect:textRect withFont:TUMonthLabelFont lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentCenter];
 	
 	CGContextRestoreGState(context);
@@ -366,7 +399,7 @@
 							TUMonthBoundaryLineWidth/2.0);
 	
 	
-	[[UIColor darkGrayColor] set];
+	[TUMonthBoundaryLineColor set];
 	CGContextSetLineWidth(context, TUMonthBoundaryLineWidth);
 	CGContextStrokePath(context);
 }
