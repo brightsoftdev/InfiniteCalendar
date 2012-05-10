@@ -270,7 +270,6 @@
 		1175B736155866A300409AD8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = InfiniteCalendar/InfiniteCalendar.entitlements;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "InfiniteCalendar/InfiniteCalendar-Prefix.pch";
 				INFOPLIST_FILE = "InfiniteCalendar/InfiniteCalendar-Info.plist";
@@ -282,7 +281,6 @@
 		1175B737155866A300409AD8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = InfiniteCalendar/InfiniteCalendar.entitlements;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "InfiniteCalendar/InfiniteCalendar-Prefix.pch";
 				INFOPLIST_FILE = "InfiniteCalendar/InfiniteCalendar-Info.plist";
