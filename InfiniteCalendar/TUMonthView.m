@@ -11,7 +11,7 @@
 #import "NSCalendar+TUShortcuts.h"
 
 
-#define TUMonthLabelWidth 30.0
+#define TUMonthLabelWidth 33.0
 #define TUMonthBoundaryLineWidth 1.0
 
 
@@ -23,6 +23,9 @@
 @property (nonatomic, readonly) NSInteger _firstDayOffset;
 @property (nonatomic, readonly) NSInteger _lastDayOffset;
 
+- (id)_backgroundPath;
+- (void)_drawDayHighlights;
+- (void)_drawDayBorders;
 - (void)_drawMonthLabel;
 - (void)_drawMonthBackground;
 - (void)_drawMonthBorder;
@@ -184,8 +187,10 @@
 - (void)drawRect:(CGRect)rect
 {
     [self _drawMonthBackground];
-	[self _drawMonthLabel];
+	[self _drawDayHighlights];
+	[self _drawDayBorders];
 	[self _drawMonthBorder];
+	[self _drawMonthLabel];
 }
 
 - (void)_drawMonthLabel
@@ -220,28 +225,102 @@
 	CGContextRestoreGState(context);
 }
 
+- (id)_backgroundPath
+{
+	CGMutablePathRef path = CGPathCreateMutable();
+	
+	
+	CGPathMoveToPoint(path, NULL, self._topLeftPoint.x,
+					  self._topLeftPoint.y + TUMonthBoundaryLineWidth);
+	CGPathAddLineToPoint(path, NULL, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth + TUMonthBoundaryLineWidth + 1.0,
+						 self._topLeftPoint.y + TUMonthBoundaryLineWidth);
+	CGPathAddLineToPoint(path, NULL, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth + TUMonthBoundaryLineWidth + 1.0,
+							TUMonthBoundaryLineWidth);
+	CGPathAddLineToPoint(path, NULL, self.bounds.size.width,
+							TUMonthBoundaryLineWidth);
+	
+	CGPathAddLineToPoint(path, NULL, self._bottomRightPoint.x,
+							self._bottomRightPoint.y);
+	CGPathAddLineToPoint(path, NULL, ([self _lastDayOffset] + 1) * self._dayHeight + TUMonthLabelWidth + 1.0,
+							self._bottomRightPoint.y);
+	CGPathAddLineToPoint(path, NULL, ([self _lastDayOffset] + 1) * self._dayHeight + TUMonthLabelWidth + 1.0,
+							self.bounds.size.height);
+	CGPathAddLineToPoint(path, NULL, TUMonthLabelWidth,
+							self.bounds.size.height);
+	
+	
+	id pathObject = CFBridgingRelease(path);
+	return pathObject;
+}
+
+- (void)_drawDayHighlights
+{
+	CGContextRef context = UIGraphicsGetCurrentContext();
+	CGContextSaveGState(context);
+	
+	CGPathRef backgroundPath = CFBridgingRetain([self _backgroundPath]);
+	CGContextAddPath(context, backgroundPath);
+	CGContextClip(context);
+	CFRelease(backgroundPath);
+	
+	
+	for (CGFloat y = TUMonthBoundaryLineWidth + 0.5; y < self.bounds.size.height; y += self._dayHeight) {
+		CGContextMoveToPoint(context, TUMonthLabelWidth, y);
+		CGContextAddLineToPoint(context, self.frame.size.width, y);
+	}
+	
+	
+	for (CGFloat x = TUMonthLabelWidth + self._dayHeight + 0.5; x < self.bounds.size.width; x += self._dayHeight) {
+		CGContextMoveToPoint(context, x, 0.0);
+		CGContextAddLineToPoint(context, x, self.frame.size.height);
+	}
+	
+	
+	[[UIColor colorWithRed:0.949 green:0.945 blue:0.953 alpha:1.000] set];
+	CGContextStrokePath(context);
+	
+	
+	CGContextRestoreGState(context);
+}
+
+- (void)_drawDayBorders
+{
+	CGContextRef context = UIGraphicsGetCurrentContext();
+	CGContextSaveGState(context);
+	
+	CGPathRef backgroundPath = CFBridgingRetain([self _backgroundPath]);
+	CGContextAddPath(context, backgroundPath);
+	CGContextClip(context);
+	CFRelease(backgroundPath);
+	
+	
+	for (CGFloat y = TUMonthBoundaryLineWidth - 0.5; y < self.bounds.size.height; y += self._dayHeight) {
+		CGContextMoveToPoint(context, TUMonthLabelWidth, y);
+		CGContextAddLineToPoint(context, self.frame.size.width, y);
+	}
+	
+	
+	for (CGFloat x = TUMonthLabelWidth + self._dayHeight + 1.5; x < self.bounds.size.width; x += self._dayHeight) {
+		CGContextMoveToPoint(context, x, 0.0);
+		CGContextAddLineToPoint(context, x, self.frame.size.height);
+	}
+	
+	
+	[[UIColor colorWithRed:0.663 green:0.675 blue:0.702 alpha:1.000] set];
+	CGContextStrokePath(context);
+	
+	
+	CGContextRestoreGState(context);
+}
+
 - (void)_drawMonthBackground
 {
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	
 	
-	CGContextMoveToPoint(context, self._topLeftPoint.x,
-						 self._topLeftPoint.y + TUMonthBoundaryLineWidth);
-	CGContextAddLineToPoint(context, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth + TUMonthBoundaryLineWidth,
-							self._topLeftPoint.y + TUMonthBoundaryLineWidth);
-	CGContextAddLineToPoint(context, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth + TUMonthBoundaryLineWidth,
-							TUMonthBoundaryLineWidth);
-	CGContextAddLineToPoint(context, self.bounds.size.width,
-							TUMonthBoundaryLineWidth);
-	
-	CGContextAddLineToPoint(context, self._bottomRightPoint.x,
-							self._bottomRightPoint.y);
-	CGContextAddLineToPoint(context, ([self _lastDayOffset] + 1) * self._dayHeight + TUMonthLabelWidth,
-							self._bottomRightPoint.y);
-	CGContextAddLineToPoint(context, ([self _lastDayOffset] + 1) * self._dayHeight + TUMonthLabelWidth,
-							self.bounds.size.height);
-	CGContextAddLineToPoint(context, TUMonthLabelWidth,
-							self.bounds.size.height);
+	CGPathRef backgroundPath = CFBridgingRetain([self _backgroundPath]);
+	CGContextAddPath(context, backgroundPath);
+	CFRelease(backgroundPath);
 	
 	
 	[[UIColor colorWithRed:0.0 green:1.0 blue:0.0 alpha:0.5] set];
@@ -255,9 +334,9 @@
 	
 	CGContextMoveToPoint(context, 0.0,
 						 self._topLeftPoint.y + TUMonthBoundaryLineWidth/2.0);
-	CGContextAddLineToPoint(context, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth + TUMonthBoundaryLineWidth/2.0,
+	CGContextAddLineToPoint(context, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth + TUMonthBoundaryLineWidth/2.0 + 1.0,
 							self._topLeftPoint.y + TUMonthBoundaryLineWidth/2.0);
-	CGContextAddLineToPoint(context, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth + TUMonthBoundaryLineWidth/2.0,
+	CGContextAddLineToPoint(context, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth + TUMonthBoundaryLineWidth/2.0 + 1.0,
 							TUMonthBoundaryLineWidth/2.0);
 	CGContextAddLineToPoint(context, self.bounds.size.width,
 							TUMonthBoundaryLineWidth/2.0);
