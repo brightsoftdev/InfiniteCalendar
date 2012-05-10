@@ -12,7 +12,7 @@
 
 
 #define TUMonthLabelFont [UIFont boldSystemFontOfSize:16.0]
-#define TUMonthLabelWidth 28.0
+#define TUMonthLabelWidth 26.0
 #define TUMonthBoundaryLineWidth 1.0
 #define TUMonthBoundaryLineColor [UIColor darkGrayColor]
 
@@ -25,12 +25,16 @@
 @property (nonatomic, readonly) NSInteger _firstDayOffset;
 @property (nonatomic, readonly) NSInteger _lastDayOffset;
 
+- (void)_enumerateDays:(void(^)(NSInteger day, CGRect dayRect))dayBlock;
+- (CGGradientRef)_labelGradient;
+- (CGGradientRef)_backgroundGradient;
 - (id)_backgroundPath;
 - (void)_drawDayHighlights;
 - (void)_drawDayBorders;
 - (void)_drawMonthLabel;
 - (void)_drawMonthBackground;
 - (void)_drawMonthBorder;
+- (void)_drawDays;
 
 @end
 
@@ -193,6 +197,28 @@
 	[self _drawDayBorders];
 	[self _drawMonthBorder];
 	[self _drawMonthLabel];
+	[self _drawDays];
+}
+
+- (void)_enumerateDays:(void(^)(NSInteger day, CGRect dayRect))dayBlock
+{
+	NSRange weeks = [[NSCalendar sharedCalendar] rangeOfUnit:NSWeekCalendarUnit inUnit:NSMonthCalendarUnit forDate:self.month];
+	NSRange days = [[NSCalendar sharedCalendar] rangeOfUnit:NSDayCalendarUnit inUnit:NSMonthCalendarUnit forDate:self.month];
+	NSInteger day = 0;
+	CGRect dayRect;
+	dayRect.origin.x = [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth + TUMonthBoundaryLineWidth*2.0;
+	dayRect.size = CGSizeMake(self._dayHeight - 2.0, self._dayHeight - 2.0);
+	for (NSInteger week = 0; week < weeks.length; week++) {
+		dayRect.origin.y = week * self._dayHeight + TUMonthBoundaryLineWidth + 1.0;
+		
+		while (dayRect.origin.x < self.frame.size.width && day < days.length) {
+			dayBlock(day, dayRect);
+			dayRect.origin.x += self._dayHeight;
+			day++;
+		}
+		
+		dayRect.origin.x = TUMonthLabelWidth + 2.0;
+	}
 }
 
 - (id)_backgroundPath
@@ -402,6 +428,21 @@
 	[TUMonthBoundaryLineColor set];
 	CGContextSetLineWidth(context, TUMonthBoundaryLineWidth);
 	CGContextStrokePath(context);
+}
+
+- (void)_drawDays
+{
+	CGContextRef context = UIGraphicsGetCurrentContext();
+	
+	[self _enumerateDays:^(NSInteger day, CGRect dayRect) {
+		[[UIColor blackColor] set];
+		NSString *dayString = [NSString stringWithFormat:@"%d", day + 1];
+		
+		CGSize stringSize = [dayString sizeWithFont:[UIFont boldSystemFontOfSize:20.0] constrainedToSize:dayRect.size];
+		dayRect.origin.y += (dayRect.size.height - stringSize.height) / 2.0;
+		
+		[dayString drawInRect:dayRect withFont:[UIFont boldSystemFontOfSize:20.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
+	}];
 }
 
 @end
