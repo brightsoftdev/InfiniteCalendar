@@ -18,6 +18,7 @@
 
 @interface NSCalendar (TUShortcuts)
 
++ (NSCalendar *)sharedCalendar;
 - (NSInteger)numberOfDaysInWeek;
 
 @end

@@ -32,10 +32,10 @@
 {
     self = [super initWithFrame:frame];
     if (self != nil) {
-        self.scrollEnabled = YES;
+		self.scrollEnabled = YES;
 		self.bounces = YES;
 		self.alwaysBounceVertical = YES;
-        self.showsVerticalScrollIndicator = YES;
+        self.showsVerticalScrollIndicator = NO;
 		
 		self.contentSize = CGSizeMake(self.bounds.size.width, 2000.0);
     }
@@ -47,10 +47,10 @@
 {
     self = [super initWithCoder:coder];
     if (self) {
-        self.scrollEnabled = YES;
+		self.scrollEnabled = YES;
 		self.bounces = YES;
 		self.alwaysBounceVertical = YES;
-        self.showsVerticalScrollIndicator = YES;
+        self.showsVerticalScrollIndicator = NO;
 		
 		self.contentSize = CGSizeMake(self.bounds.size.width, 2000.0);
 		
@@ -58,14 +58,13 @@
 		_monthViewQueue = [[NSMutableSet alloc] init];
 		
 		
-		TUMonthView *monthView = [[TUMonthView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.frame.size.width, 100.0)];
+		TUMonthView *monthView = [self _dequeueMonthView];
 		monthView.month = [NSDate date];
 		monthView.frame = CGRectMake(0.0,
 									 -1.0,
 									 self.frame.size.width,
 									 monthView.frame.size.height);
 		[self addSubview:monthView];
-		
 		[_monthViews addObject:monthView];
     }
     return self;
@@ -146,7 +145,7 @@
 		TUMonthView *monthView = [self _dequeueMonthView];
 		NSDateComponents *components = [[NSDateComponents alloc] init];
 		components.month = 1;
-		monthView.month = [[NSCalendar currentCalendar] dateByAddingComponents:components toDate:lastMonthView.month options:0];
+		monthView.month = [[NSCalendar sharedCalendar] dateByAddingComponents:components toDate:lastMonthView.month options:0];
 		monthView.frame = CGRectMake(0.0,
 									 lastMonthView.frame.origin.y + lastMonthView.frame.size.height - [monthView topOffset],
 									 self.frame.size.width,
@@ -162,7 +161,7 @@
 		TUMonthView *monthView = [self _dequeueMonthView];
 		NSDateComponents *components = [[NSDateComponents alloc] init];
 		components.month = -1;
-		monthView.month = [[NSCalendar currentCalendar] dateByAddingComponents:components toDate:lastMonthView.month options:0];
+		monthView.month = [[NSCalendar sharedCalendar] dateByAddingComponents:components toDate:lastMonthView.month options:0];
 		monthView.frame = CGRectMake(0.0,
 									 CGRectGetMinY(lastMonthView.frame) + [lastMonthView topOffset] - monthView.frame.size.height,
 									 self.frame.size.width,
@@ -219,7 +218,7 @@
 	while ((comparison = [lastMonth.firstDayOfMonth compare:month.firstDayOfMonth]) != NSOrderedSame) {
 		NSDateComponents *monthMovement = [[NSDateComponents alloc] init];
 		monthMovement.month = (comparison == NSOrderedAscending) ? 1 : -1;
-		NSDate *newMonth = [[NSCalendar currentCalendar] dateByAddingComponents:monthMovement toDate:lastMonth options:0];
+		NSDate *newMonth = [[NSCalendar sharedCalendar] dateByAddingComponents:monthMovement toDate:lastMonth options:0];
 		
 		if (comparison == NSOrderedAscending) {
 			offset.y += [TUMonthView verticalOffsetForWidth:self.frame.size.width month:lastMonth];
