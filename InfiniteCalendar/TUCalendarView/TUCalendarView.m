@@ -109,30 +109,16 @@
 
 - (BOOL)_lastMonthNeeded
 {
-	__block BOOL lastMonthNeeded = YES;
-	CGPoint lastPoint = CGPointMake(CGRectGetMaxX(self.bounds) - 1.0, CGRectGetMaxY(self.bounds) + 100.0);
+	TUMonthView *lastMonthView = [_monthViews lastObject];
 	
-	[_monthViews enumerateObjectsUsingBlock:^(TUMonthView *monthView, NSUInteger index, BOOL *stop) {
-		lastMonthNeeded = !CGRectContainsPoint(monthView.frame, lastPoint);
-		
-		*stop = !lastMonthNeeded;
-	}];
-	
-	return lastMonthNeeded && CGRectGetMaxY([[_monthViews lastObject] frame]) < CGRectGetMaxY(self.bounds) + 100.0;
+	return CGRectGetMaxY(lastMonthView.frame) < CGRectGetMaxY(self.bounds) + 100.0;
 }
 
 - (BOOL)_firstMonthNeeded
 {
-	__block BOOL firstMonthNeeded = YES;
-	CGPoint lastPoint = CGPointMake(CGRectGetMinX(self.bounds) + 1.0, CGRectGetMinY(self.bounds) - 100.0);
+	TUMonthView *lastMonthView = [_monthViews objectAtIndex:0];
 	
-	[_monthViews enumerateObjectsUsingBlock:^(TUMonthView *monthView, NSUInteger index, BOOL *stop) {
-		firstMonthNeeded = !CGRectContainsPoint(monthView.frame, lastPoint);
-		
-		*stop = !firstMonthNeeded;
-	}];
-	
-	return firstMonthNeeded && CGRectGetMinY([[_monthViews objectAtIndex:0] frame]) > self.bounds.origin.y - 100.0;
+	return CGRectGetMinY(lastMonthView.frame) > self.bounds.origin.y - 100.0;
 }
 
 - (TUMonthView *)_dequeueMonthView
@@ -178,6 +164,68 @@
 
 - (void)_updateMonthViews
 {
+	NSInteger monthOffset = 0;
+	CGFloat positionOffset = 0.0;
+	
+	while ([self _lastMonthNeeded]) {
+		//month view to the end
+		TUMonthView *lastMonthView = [_monthViews lastObject];
+		
+		NSDateComponents *components = [[NSDateComponents alloc] init];
+		components.month = 1 + monthOffset;
+		NSDate *month = [[NSCalendar sharedCalendar] dateByAddingComponents:components toDate:lastMonthView.month options:0];
+		
+		CGFloat offset = [TUMonthView verticalOffsetForWidth:self.frame.size.width month:month];
+		if (CGRectGetMaxY(lastMonthView.frame) + offset + positionOffset > self.bounds.origin.y - 100.0) {
+			TUMonthView *monthView = [self _dequeueMonthView];
+			monthView.month = month;
+			monthView.frame = CGRectMake(0.0,
+										 CGRectGetMaxY(lastMonthView.frame) - [monthView topOffset] + positionOffset,
+										 self.frame.size.width,
+										 monthView.frame.size.height);
+			[self insertSubview:monthView atIndex:0];
+			[_monthViews addObject:monthView];
+			
+			monthOffset = 0;
+			positionOffset = 0.0;
+		} else {
+			positionOffset += offset;
+			monthOffset++;
+		}
+	}
+	
+	monthOffset = 0;
+	positionOffset = 0.0;
+	
+	while ([self _firstMonthNeeded]) {
+		NSLog(@"month: %d position: %f", monthOffset, positionOffset);
+		
+		TUMonthView *lastMonthView = [_monthViews objectAtIndex:0];
+		
+		NSDateComponents *components = [[NSDateComponents alloc] init];
+		components.month = -1 - monthOffset;
+		NSDate *month = [[NSCalendar sharedCalendar] dateByAddingComponents:components toDate:lastMonthView.month options:0];
+		
+		CGFloat offset = [TUMonthView verticalOffsetForWidth:self.frame.size.width month:month];
+		if (CGRectGetMinY(lastMonthView.frame) - offset - positionOffset < CGRectGetMaxY(self.bounds) + 100.0) {
+			TUMonthView *monthView = [self _dequeueMonthView];
+			monthView.month = month;
+			monthView.frame = CGRectMake(0.0,
+										 CGRectGetMinY(lastMonthView.frame) + [lastMonthView topOffset] - monthView.frame.size.height - positionOffset,
+										 self.frame.size.width,
+										 monthView.frame.size.height);
+			[self insertSubview:monthView atIndex:0];
+			[_monthViews insertObject:monthView atIndex:0];
+			
+			monthOffset = 0;
+			positionOffset = 0.0;
+		} else {
+			positionOffset += offset;
+			monthOffset++;
+		}
+	}
+	
+	
 	[[_monthViews copy] enumerateObjectsUsingBlock:^(TUMonthView *monthView, NSUInteger index, BOOL *stop) {
 		if (!CGRectIntersectsRect(self.bounds, monthView.frame) && _monthViews.count > 1) {
 			[monthView removeFromSuperview];
@@ -185,38 +233,6 @@
 			[_monthViewQueue addObject:monthView];
 		}
 	}];
-	
-	while ([self _lastMonthNeeded]) {
-		TUMonthView *lastMonthView = [_monthViews lastObject];
-		
-		TUMonthView *monthView = [self _dequeueMonthView];
-		NSDateComponents *components = [[NSDateComponents alloc] init];
-		components.month = 1;
-		monthView.month = [[NSCalendar sharedCalendar] dateByAddingComponents:components toDate:lastMonthView.month options:0];
-		monthView.frame = CGRectMake(0.0,
-									 lastMonthView.frame.origin.y + lastMonthView.frame.size.height - [monthView topOffset],
-									 self.frame.size.width,
-									 monthView.frame.size.height);
-		[self insertSubview:monthView atIndex:0];
-		
-		[_monthViews addObject:monthView];
-	}
-	
-	while ([self _firstMonthNeeded]) {
-		TUMonthView *lastMonthView = [_monthViews objectAtIndex:0];
-		
-		TUMonthView *monthView = [self _dequeueMonthView];
-		NSDateComponents *components = [[NSDateComponents alloc] init];
-		components.month = -1;
-		monthView.month = [[NSCalendar sharedCalendar] dateByAddingComponents:components toDate:lastMonthView.month options:0];
-		monthView.frame = CGRectMake(0.0,
-									 CGRectGetMinY(lastMonthView.frame) + [lastMonthView topOffset] - monthView.frame.size.height,
-									 self.frame.size.width,
-									 monthView.frame.size.height);
-		[self insertSubview:monthView atIndex:0];
-		
-		[_monthViews insertObject:monthView atIndex:0];
-	}
 }
 
 - (void)layoutSubviews
