@@ -31,16 +31,39 @@
 	TUCalendarHeaderView *_headerView;
 }
 
+#pragma mark - Initialization
+
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self != nil) {
 		self.scrollEnabled = YES;
-		self.bounces = YES;
-		self.alwaysBounceVertical = YES;
         self.showsVerticalScrollIndicator = NO;
 		
 		self.contentSize = CGSizeMake(self.bounds.size.width, 2000.0);
+		
+		_monthViews = [[NSMutableArray alloc] init];
+		_monthViewQueue = [[NSMutableSet alloc] init];
+		
+		_headerView = [[TUCalendarHeaderView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.frame.size.width, 15.0)];
+		_headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
+		[self addSubview:_headerView];
+		
+		
+		TUMonthView *monthView = [self _dequeueMonthView];
+		monthView.month = [NSDate date];
+		monthView.frame = CGRectMake(0.0,
+									 -1.0,
+									 self.frame.size.width,
+									 monthView.frame.size.height);
+		[self insertSubview:monthView atIndex:0];
+		[_monthViews addObject:monthView];
+		
+		
+		
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self scrollToMonth:[NSDate date]];
+		});
     }
 	
     return self;
@@ -51,8 +74,6 @@
     self = [super initWithCoder:coder];
     if (self) {
 		self.scrollEnabled = YES;
-		self.bounces = YES;
-		self.alwaysBounceVertical = YES;
         self.showsVerticalScrollIndicator = NO;
 		
 		self.contentSize = CGSizeMake(self.bounds.size.width, 2000.0);
@@ -82,6 +103,9 @@
     }
     return self;
 }
+
+
+#pragma mark - Month View Management
 
 - (BOOL)_lastMonthNeeded
 {
@@ -123,6 +147,9 @@
 	
 	return monthView;
 }
+
+
+#pragma mark - Scroll Adjustments
 
 - (void)_recenterIfNecessary
 {
@@ -201,26 +228,8 @@
 	[self _updateMonthViews];
 }
 
-- (void)drawRect:(CGRect)rect
-{
-	CGContextRef context = UIGraphicsGetCurrentContext();
-	
-	[[UIColor whiteColor] set];
-	CGContextFillRect(context, self.bounds);
-	
-	for (CGFloat i = -0.5; i < self.bounds.size.height; i += 50.0) {
-		CGContextMoveToPoint(context, 0.0, i);
-		CGContextAddLineToPoint(context, self.bounds.size.width, i);
-	}
-	
-	for (CGFloat i = -0.5; i < self.bounds.size.width; i += 50.0) {
-		CGContextMoveToPoint(context, i, 0.0);
-		CGContextAddLineToPoint(context, i, self.bounds.size.height);
-	}
-	
-	[[UIColor lightGrayColor] set];
-	CGContextStrokePath(context);
-}
+
+#pragma mark - Scrolling Control
 
 - (void)scrollToMonth:(NSDate *)month
 {

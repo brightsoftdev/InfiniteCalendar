@@ -39,6 +39,8 @@
 	NSInteger _lastDayOffset;
 }
 
+#pragma mark - Properties
+
 @synthesize month = _month;
 
 - (void)setMonth:(NSDate *)month
@@ -51,6 +53,60 @@
 	[self sizeToFit];
 	[self setNeedsDisplay];
 }
+
+
+#pragma mark - Initialization
+
+- (id)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self != nil) {
+        self.opaque = NO;
+		_dayHeight = 0.0;
+		
+		self.month = [NSDate date];
+    }
+	
+    return self;
+}
+
+- (id)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self != nil) {
+        self.opaque = NO;
+		_dayHeight = 0.0;
+		
+		self.month = [NSDate date];
+    }
+	
+    return self;
+}
+
+
+#pragma mark - Sizing
+
+- (void)setFrame:(CGRect)frame
+{
+	[super setFrame:frame];
+	
+	_dayHeight = 0.0;
+	_firstDayOffset = -1;
+	_lastDayOffset = -1;
+}
+
+- (CGSize)sizeThatFits:(CGSize)size
+{
+	CGFloat dayHeight = roundf((size.width - TUMonthLabelWidth) / [[NSCalendar sharedCalendar] numberOfDaysInWeek]);
+	NSInteger weeks = [[NSCalendar sharedCalendar] rangeOfUnit:NSWeekCalendarUnit inUnit:NSMonthCalendarUnit forDate:self.month].length;
+	
+	size.height = dayHeight * weeks;
+	
+	return size;
+}
+
+
+#pragma mark - Geometry
 
 - (CGFloat)topOffset
 {
@@ -139,50 +195,8 @@
 	return point;
 }
 
-- (void)setFrame:(CGRect)frame
-{
-	[super setFrame:frame];
-	
-	_dayHeight = 0.0;
-	_firstDayOffset = -1;
-	_lastDayOffset = -1;
-}
 
-- (id)initWithFrame:(CGRect)frame
-{
-    self = [super initWithFrame:frame];
-    if (self != nil) {
-        self.opaque = NO;
-		_dayHeight = 0.0;
-		
-		self.month = [NSDate date];
-    }
-	
-    return self;
-}
-
-- (id)initWithCoder:(NSCoder *)coder
-{
-    self = [super initWithCoder:coder];
-    if (self != nil) {
-        self.opaque = NO;
-		_dayHeight = 0.0;
-		
-		self.month = [NSDate date];
-    }
-	
-    return self;
-}
-
-- (CGSize)sizeThatFits:(CGSize)size
-{
-	CGFloat dayHeight = roundf((size.width - TUMonthLabelWidth) / [[NSCalendar sharedCalendar] numberOfDaysInWeek]);
-	NSInteger weeks = [[NSCalendar sharedCalendar] rangeOfUnit:NSWeekCalendarUnit inUnit:NSMonthCalendarUnit forDate:self.month].length;
-	
-	size.height = dayHeight * weeks;
-	
-	return size;
-}
+#pragma mark - Drawing
 
 - (void)drawRect:(CGRect)rect
 {
