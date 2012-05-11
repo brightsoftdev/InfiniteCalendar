@@ -200,10 +200,10 @@
 	NSRange days = [[NSCalendar sharedCalendar] rangeOfUnit:NSDayCalendarUnit inUnit:NSMonthCalendarUnit forDate:self.month];
 	NSInteger day = 0;
 	CGRect dayRect;
-	dayRect.origin.x = [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth + TUMonthBoundaryLineWidth*2.0;
-	dayRect.size = CGSizeMake(self._dayHeight - 2.0, self._dayHeight - 2.0);
+	dayRect.origin.x = [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth;
+	dayRect.size = CGSizeMake(self._dayHeight - 1.0, self._dayHeight - 1.0);
 	for (NSInteger week = 0; week < weeks.length; week++) {
-		dayRect.origin.y = week * self._dayHeight + TUMonthBoundaryLineWidth + 1.0;
+		dayRect.origin.y = week * self._dayHeight + TUMonthBoundaryLineWidth;
 		
 		while (dayRect.origin.x < self.frame.size.width && day < days.length) {
 			dayBlock(day, dayRect);
@@ -211,7 +211,7 @@
 			day++;
 		}
 		
-		dayRect.origin.x = TUMonthLabelWidth + 2.0;
+		dayRect.origin.x = TUMonthLabelWidth;
 	}
 }
 
@@ -222,18 +222,18 @@
 	
 	CGPathMoveToPoint(path, NULL, self._topLeftPoint.x,
 					  self._topLeftPoint.y + TUMonthBoundaryLineWidth);
-	CGPathAddLineToPoint(path, NULL, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth + TUMonthBoundaryLineWidth + 1.0,
+	CGPathAddLineToPoint(path, NULL, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth - TUMonthBoundaryLineWidth,
 						 self._topLeftPoint.y + TUMonthBoundaryLineWidth);
-	CGPathAddLineToPoint(path, NULL, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth + TUMonthBoundaryLineWidth + 1.0,
+	CGPathAddLineToPoint(path, NULL, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth - TUMonthBoundaryLineWidth,
 						 TUMonthBoundaryLineWidth);
 	CGPathAddLineToPoint(path, NULL, self.bounds.size.width,
 						 TUMonthBoundaryLineWidth);
 	
 	CGPathAddLineToPoint(path, NULL, self._bottomRightPoint.x,
 						 self._bottomRightPoint.y);
-	CGPathAddLineToPoint(path, NULL, ([self _lastDayOffset] + 1) * self._dayHeight + TUMonthLabelWidth + 1.0,
+	CGPathAddLineToPoint(path, NULL, ([self _lastDayOffset] + 1) * self._dayHeight + TUMonthLabelWidth - TUMonthBoundaryLineWidth,
 						 self._bottomRightPoint.y);
-	CGPathAddLineToPoint(path, NULL, ([self _lastDayOffset] + 1) * self._dayHeight + TUMonthLabelWidth + 1.0,
+	CGPathAddLineToPoint(path, NULL, ([self _lastDayOffset] + 1) * self._dayHeight + TUMonthLabelWidth - TUMonthBoundaryLineWidth,
 						 self.bounds.size.height);
 	CGPathAddLineToPoint(path, NULL, TUMonthLabelWidth,
 						 self.bounds.size.height);
@@ -324,7 +324,7 @@
 	}
 	
 	
-	for (CGFloat x = TUMonthLabelWidth + self._dayHeight + 0.5; x < self.bounds.size.width; x += self._dayHeight) {
+	for (CGFloat x = TUMonthLabelWidth + self._dayHeight - 1.5; x < self.bounds.size.width; x += self._dayHeight) {
 		CGContextMoveToPoint(context, x, 0.0);
 		CGContextAddLineToPoint(context, x, self.frame.size.height);
 	}
@@ -354,7 +354,7 @@
 	}
 	
 	
-	for (CGFloat x = TUMonthLabelWidth + self._dayHeight + 1.5; x < self.bounds.size.width; x += self._dayHeight) {
+	for (CGFloat x = TUMonthLabelWidth + self._dayHeight - 0.5; x < self.bounds.size.width; x += self._dayHeight) {
 		CGContextMoveToPoint(context, x, 0.0);
 		CGContextAddLineToPoint(context, x, self.frame.size.height);
 	}
@@ -411,9 +411,9 @@
 	
 	CGContextMoveToPoint(context, 0.0,
 						 self._topLeftPoint.y + TUMonthBoundaryLineWidth/2.0);
-	CGContextAddLineToPoint(context, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth + TUMonthBoundaryLineWidth/2.0 + 1.0,
+	CGContextAddLineToPoint(context, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth - TUMonthBoundaryLineWidth/2.0,
 							self._topLeftPoint.y + TUMonthBoundaryLineWidth/2.0);
-	CGContextAddLineToPoint(context, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth + TUMonthBoundaryLineWidth/2.0 + 1.0,
+	CGContextAddLineToPoint(context, [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth - TUMonthBoundaryLineWidth/2.0,
 							TUMonthBoundaryLineWidth/2.0);
 	CGContextAddLineToPoint(context, self.bounds.size.width,
 							TUMonthBoundaryLineWidth/2.0);
