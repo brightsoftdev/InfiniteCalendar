@@ -11,12 +11,6 @@
 #import "NSCalendar+TUShortcuts.h"
 
 
-#define TUMonthLabelFont [UIFont boldSystemFontOfSize:16.0]
-#define TUMonthLabelWidth 26.0
-#define TUMonthBoundaryLineWidth 1.0
-#define TUMonthBoundaryLineColor [UIColor darkGrayColor]
-
-
 @interface TUMonthView ()
 
 @property (nonatomic, readonly) CGFloat _dayHeight;

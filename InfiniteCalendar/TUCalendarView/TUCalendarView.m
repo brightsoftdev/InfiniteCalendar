@@ -9,6 +9,7 @@
 #import "TUCalendarView.h"
 
 #import "TUMonthView.h"
+#import "TUCalendarHeaderView.h"
 #import "NSCalendar+TUShortcuts.h"
 
 
@@ -17,6 +18,7 @@
 - (BOOL)_lastMonthNeeded;
 - (BOOL)_firstMonthNeeded;
 - (void)_recenterIfNecessary;
+- (void)_updateHeaderPosition;
 - (void)_updateMonthViews;
 - (TUMonthView *)_dequeueMonthView;
 
@@ -26,6 +28,7 @@
 @implementation TUCalendarView {
 	NSMutableArray *_monthViews;
 	NSMutableSet *_monthViewQueue;
+	TUCalendarHeaderView *_headerView;
 }
 
 - (id)initWithFrame:(CGRect)frame
@@ -57,6 +60,10 @@
 		_monthViews = [[NSMutableArray alloc] init];
 		_monthViewQueue = [[NSMutableSet alloc] init];
 		
+		_headerView = [[TUCalendarHeaderView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.frame.size.width, 15.0)];
+		_headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
+		[self addSubview:_headerView];
+		
 		
 		TUMonthView *monthView = [self _dequeueMonthView];
 		monthView.month = [NSDate date];
@@ -64,8 +71,14 @@
 									 -1.0,
 									 self.frame.size.width,
 									 monthView.frame.size.height);
-		[self addSubview:monthView];
+		[self insertSubview:monthView atIndex:0];
 		[_monthViews addObject:monthView];
+		
+		
+		
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self scrollToMonth:[NSDate date]];
+		});
     }
     return self;
 }
@@ -98,6 +111,19 @@
 	return firstMonthNeeded && CGRectGetMinY([[_monthViews objectAtIndex:0] frame]) > self.bounds.origin.y - 100.0;
 }
 
+- (TUMonthView *)_dequeueMonthView
+{
+	TUMonthView *monthView = [_monthViewQueue anyObject];
+	
+	if (monthView  == nil) {
+		monthView = [[TUMonthView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.frame.size.width, 100.0)];
+	} else {
+		[_monthViewQueue removeObject:monthView];
+	}
+	
+	return monthView;
+}
+
 - (void)_recenterIfNecessary
 {
 	CGPoint currentOffset = self.contentOffset;
@@ -116,17 +142,11 @@
 	}
 }
 
-- (TUMonthView *)_dequeueMonthView
+- (void)_updateHeaderPosition
 {
-	TUMonthView *monthView = [_monthViewQueue anyObject];
-	
-	if (monthView  == nil) {
-		monthView = [[TUMonthView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.frame.size.width, 100.0)];
-	} else {
-		[_monthViewQueue removeObject:monthView];
-	}
-	
-	return monthView;
+	CGRect headerFrame = _headerView.frame;
+	headerFrame.origin.y = self.contentOffset.y;
+	_headerView.frame = headerFrame;
 }
 
 - (void)_updateMonthViews
@@ -177,6 +197,7 @@
 	[super layoutSubviews];
 	
 	[self _recenterIfNecessary];
+	[self _updateHeaderPosition];
 	[self _updateMonthViews];
 }
 
@@ -211,7 +232,7 @@
 	CGPoint offset = self.contentOffset;
 	TUMonthView *referenceMonthView = [_monthViews lastObject];
 	
-	offset.y =referenceMonthView.frame.origin.y + referenceMonthView.topOffset;
+	offset.y = referenceMonthView.frame.origin.y + referenceMonthView.topOffset - _headerView.frame.size.height;
 	
 	NSDate *lastMonth = referenceMonthView.month;
 	NSComparisonResult comparison;

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		11159918155D8E4E00368BDD /* TUCalendarHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 11159917155D8E4E00368BDD /* TUCalendarHeaderView.m */; };
 		1129231815587BEA009FEEA9 /* TUMonthView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1129231715587BEA009FEEA9 /* TUMonthView.m */; };
 		1168891C155868AB00CBE4CB /* TUCalendarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1168891B155868AB00CBE4CB /* TUCalendarView.m */; };
 		1175B717155866A300409AD8 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1175B716155866A300409AD8 /* UIKit.framework */; };
@@ -25,6 +26,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		11159916155D8E4E00368BDD /* TUCalendarHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TUCalendarHeaderView.h; sourceTree = "<group>"; };
+		11159917155D8E4E00368BDD /* TUCalendarHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TUCalendarHeaderView.m; sourceTree = "<group>"; };
 		1129231615587BEA009FEEA9 /* TUMonthView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TUMonthView.h; sourceTree = "<group>"; };
 		1129231715587BEA009FEEA9 /* TUMonthView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TUMonthView.m; sourceTree = "<group>"; };
 		1168891A155868AB00CBE4CB /* TUCalendarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TUCalendarView.h; sourceTree = "<group>"; };
@@ -71,12 +74,15 @@
 				1168891B155868AB00CBE4CB /* TUCalendarView.m */,
 				1129231615587BEA009FEEA9 /* TUMonthView.h */,
 				1129231715587BEA009FEEA9 /* TUMonthView.m */,
+				11159916155D8E4E00368BDD /* TUCalendarHeaderView.h */,
+				11159917155D8E4E00368BDD /* TUCalendarHeaderView.m */,
 				11FA906B155AEF1B0042D50E /* NSCalendar+TUShortcuts.h */,
 				11FA906C155AEF1B0042D50E /* NSCalendar+TUShortcuts.m */,
 				118DB0C4155C8C2F00CB5C04 /* day-gradient.png */,
 				118DB0C5155C8C2F00CB5C04 /* day-gradient@2x.png */,
 			);
 			name = TUCalendar;
+			path = TUCalendarView;
 			sourceTree = "<group>";
 		};
 		1175B707155866A300409AD8 = {
@@ -207,6 +213,7 @@
 				1168891C155868AB00CBE4CB /* TUCalendarView.m in Sources */,
 				1129231815587BEA009FEEA9 /* TUMonthView.m in Sources */,
 				11FA906D155AEF1B0042D50E /* NSCalendar+TUShortcuts.m in Sources */,
+				11159918155D8E4E00368BDD /* TUCalendarHeaderView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
