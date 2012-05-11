@@ -18,6 +18,8 @@
 		1175B729155866A300409AD8 /* InfiniteCalendar.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 1175B728155866A300409AD8 /* InfiniteCalendar.entitlements */; };
 		1175B72C155866A300409AD8 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1175B72A155866A300409AD8 /* MainStoryboard.storyboard */; };
 		1175B73A1558679800409AD8 /* TUCalendarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1175B7391558679800409AD8 /* TUCalendarViewController.m */; };
+		118DB0C6155C8C2F00CB5C04 /* day-gradient.png in Resources */ = {isa = PBXBuildFile; fileRef = 118DB0C4155C8C2F00CB5C04 /* day-gradient.png */; };
+		118DB0C7155C8C2F00CB5C04 /* day-gradient@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 118DB0C5155C8C2F00CB5C04 /* day-gradient@2x.png */; };
 		11FA906D155AEF1B0042D50E /* NSCalendar+TUShortcuts.m in Sources */ = {isa = PBXBuildFile; fileRef = 11FA906C155AEF1B0042D50E /* NSCalendar+TUShortcuts.m */; };
 /* End PBXBuildFile section */
 
@@ -40,6 +42,8 @@
 		1175B72B155866A300409AD8 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
 		1175B7381558679800409AD8 /* TUCalendarViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TUCalendarViewController.h; sourceTree = "<group>"; };
 		1175B7391558679800409AD8 /* TUCalendarViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TUCalendarViewController.m; sourceTree = "<group>"; };
+		118DB0C4155C8C2F00CB5C04 /* day-gradient.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "day-gradient.png"; sourceTree = "<group>"; };
+		118DB0C5155C8C2F00CB5C04 /* day-gradient@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "day-gradient@2x.png"; sourceTree = "<group>"; };
 		11FA906B155AEF1B0042D50E /* NSCalendar+TUShortcuts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSCalendar+TUShortcuts.h"; sourceTree = "<group>"; };
 		11FA906C155AEF1B0042D50E /* NSCalendar+TUShortcuts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSCalendar+TUShortcuts.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -67,6 +71,8 @@
 				1129231715587BEA009FEEA9 /* TUMonthView.m */,
 				11FA906B155AEF1B0042D50E /* NSCalendar+TUShortcuts.h */,
 				11FA906C155AEF1B0042D50E /* NSCalendar+TUShortcuts.m */,
+				118DB0C4155C8C2F00CB5C04 /* day-gradient.png */,
+				118DB0C5155C8C2F00CB5C04 /* day-gradient@2x.png */,
 			);
 			name = TUCalendar;
 			sourceTree = "<group>";
@@ -179,6 +185,8 @@
 				1175B721155866A300409AD8 /* InfoPlist.strings in Resources */,
 				1175B729155866A300409AD8 /* InfiniteCalendar.entitlements in Resources */,
 				1175B72C155866A300409AD8 /* MainStoryboard.storyboard in Resources */,
+				118DB0C6155C8C2F00CB5C04 /* day-gradient.png in Resources */,
+				118DB0C7155C8C2F00CB5C04 /* day-gradient@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

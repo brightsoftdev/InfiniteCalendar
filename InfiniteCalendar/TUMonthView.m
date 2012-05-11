@@ -435,13 +435,23 @@
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	
 	[self _enumerateDays:^(NSInteger day, CGRect dayRect) {
-		[[UIColor blackColor] set];
+		CGContextSaveGState(context);
+		
 		NSString *dayString = [NSString stringWithFormat:@"%d", day + 1];
 		
 		CGSize stringSize = [dayString sizeWithFont:[UIFont boldSystemFontOfSize:20.0] constrainedToSize:dayRect.size];
-		dayRect.origin.y += (dayRect.size.height - stringSize.height) / 2.0;
+		dayRect.origin.y += (dayRect.size.height - stringSize.height) / 2.0 + 1.0;
+		dayRect.size.height = stringSize.height;
 		
+		[[UIColor whiteColor] set];
 		[dayString drawInRect:dayRect withFont:[UIFont boldSystemFontOfSize:20.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
+		
+		dayRect.origin.y -= 1.0;
+		[[UIColor colorWithPatternImage:[UIImage imageNamed:@"day-gradient.png"]] set];
+		CGContextSetPatternPhase(context, CGSizeMake(0.0, dayRect.origin.y));
+		[dayString drawInRect:dayRect withFont:[UIFont boldSystemFontOfSize:20.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
+		
+		CGContextRestoreGState(context);
 	}];
 }
 
