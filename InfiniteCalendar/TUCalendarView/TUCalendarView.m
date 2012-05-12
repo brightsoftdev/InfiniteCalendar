@@ -168,7 +168,7 @@
 	CGFloat positionOffset = 0.0;
 	
 	while ([self _lastMonthNeeded]) {
-		//month view to the end
+		//add month view to the end
 		TUMonthView *lastMonthView = [_monthViews lastObject];
 		
 		NSDateComponents *components = [[NSDateComponents alloc] init];
@@ -198,8 +198,7 @@
 	positionOffset = 0.0;
 	
 	while ([self _firstMonthNeeded]) {
-		NSLog(@"month: %d position: %f", monthOffset, positionOffset);
-		
+		//add month view to the beggining
 		TUMonthView *lastMonthView = [_monthViews objectAtIndex:0];
 		
 		NSDateComponents *components = [[NSDateComponents alloc] init];

@@ -442,20 +442,49 @@
 {
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	
+	NSDateComponents *today = [[NSCalendar sharedCalendar] components:NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[NSDate date]];
+	NSDateComponents *month = [[NSCalendar sharedCalendar] components:NSYearCalendarUnit | NSMonthCalendarUnit fromDate:self.month];
+	
 	[self _enumerateDays:^(NSInteger day, CGRect dayRect) {
 		CGContextSaveGState(context);
 		
 		NSString *dayString = [NSString stringWithFormat:@"%d", day + 1];
+		UIColor *textColor;
+		UIColor *shadowColor;
+		
+		BOOL isToday = month.year == today.year && month.month == today.month && day+1 == today.day;
+		
+		if (isToday) {
+			[[UIColor colorWithRed:0.455 green:0.537 blue:0.643 alpha:1.000] setFill];
+			CGContextFillRect(context, dayRect);
+			
+			CGContextSaveGState(context);
+			CGContextSetShadowWithColor(context, CGSizeZero, 5.0, [UIColor colorWithRed:0.116 green:0.214 blue:0.343 alpha:1.000].CGColor);
+			CGContextClipToRect(context, dayRect);
+			CGContextAddRect(context, CGRectInset(dayRect, -10.0, -10.0));
+			CGContextAddRect(context, dayRect);
+			CGContextEOFillPath(context);
+			CGContextRestoreGState(context);
+			
+			[[UIColor colorWithRed:0.216 green:0.314 blue:0.443 alpha:1.000] setStroke];
+			CGContextStrokeRect(context, CGRectInset(dayRect, -0.5, -0.5));
+			
+			textColor = [UIColor whiteColor];
+			shadowColor = [UIColor darkGrayColor];
+		} else {
+			textColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"day-gradient.png"]];
+			shadowColor = [UIColor whiteColor];
+		}
 		
 		CGSize stringSize = [dayString sizeWithFont:[UIFont boldSystemFontOfSize:20.0] constrainedToSize:dayRect.size];
 		dayRect.origin.y += (dayRect.size.height - stringSize.height) / 2.0 + 1.0;
 		dayRect.size.height = stringSize.height;
 		
-		[[UIColor whiteColor] set];
+		[shadowColor set];
 		[dayString drawInRect:dayRect withFont:[UIFont boldSystemFontOfSize:20.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
 		
 		dayRect.origin.y -= 1.0;
-		[[UIColor colorWithPatternImage:[UIImage imageNamed:@"day-gradient.png"]] set];
+		[textColor set];
 		CGContextSetPatternPhase(context, CGSizeMake(0.0, dayRect.origin.y));
 		[dayString drawInRect:dayRect withFont:[UIFont boldSystemFontOfSize:20.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
 		
