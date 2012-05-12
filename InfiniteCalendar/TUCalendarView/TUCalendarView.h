@@ -10,6 +10,9 @@
 
 @interface TUCalendarView : UIScrollView
 
+@property (nonatomic, strong) NSDateComponents *selectedDay;
+- (void)setSelectedDay:(NSDateComponents *)selectedDay animated:(BOOL)animated;
+
 - (void)scrollToMonth:(NSDate *)month;
 - (void)scrollToMonth:(NSDate *)month animated:(BOOL)animated;
 

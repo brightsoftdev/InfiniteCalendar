@@ -8,6 +8,7 @@
 
 #import "TUMonthView.h"
 
+#import "TUCalendarView.h"
 #import "NSCalendar+TUShortcuts.h"
 
 
@@ -19,9 +20,10 @@
 @property (nonatomic, readonly) NSInteger _firstDayOffset;
 @property (nonatomic, readonly) NSInteger _lastDayOffset;
 
-- (void)_enumerateDays:(void(^)(NSInteger day, CGRect dayRect))dayBlock;
+- (void)_enumerateDays:(void(^)(NSDateComponents *day, CGRect dayRect, BOOL *stop))dayBlock;
 - (CGGradientRef)_labelGradient;
 - (CGGradientRef)_backgroundGradient;
+- (CGGradientRef)_selectedGradient;
 - (id)_backgroundPath;
 - (void)_drawDayHighlights;
 - (void)_drawDayBorders;
@@ -41,6 +43,7 @@
 
 #pragma mark - Properties
 
+@synthesize calendarView = _calendarView;
 @synthesize month = _month;
 
 - (void)setMonth:(NSDate *)month
@@ -195,6 +198,21 @@
 	return point;
 }
 
+- (NSDateComponents *)dayAtPoint:(CGPoint)point
+{
+	__block NSDateComponents *dayComponents = nil;
+	
+	[self _enumerateDays:^(NSDateComponents *day, CGRect dayRect, BOOL *stop) {
+		if (CGRectContainsPoint(dayRect, point)) {
+			dayComponents = [day copy];
+			
+			*stop = YES;
+		}
+	}];
+	
+	return dayComponents;
+}
+
 
 #pragma mark - Drawing
 
@@ -208,21 +226,24 @@
 	[self _drawDays];
 }
 
-- (void)_enumerateDays:(void(^)(NSInteger day, CGRect dayRect))dayBlock
+- (void)_enumerateDays:(void(^)(NSDateComponents *day, CGRect dayRect, BOOL *stop))dayBlock
 {
 	NSRange weeks = [[NSCalendar sharedCalendar] rangeOfUnit:NSWeekCalendarUnit inUnit:NSMonthCalendarUnit forDate:self.month];
 	NSRange days = [[NSCalendar sharedCalendar] rangeOfUnit:NSDayCalendarUnit inUnit:NSMonthCalendarUnit forDate:self.month];
-	NSInteger day = 0;
+	NSDateComponents *day = [[NSCalendar sharedCalendar] components:NSYearCalendarUnit | NSMonthCalendarUnit fromDate:self.month];
+	day.day = days.location;
 	CGRect dayRect;
 	dayRect.origin.x = [self _firstDayOffset] * self._dayHeight + TUMonthLabelWidth;
 	dayRect.size = CGSizeMake(self._dayHeight - 1.0, self._dayHeight - 1.0);
-	for (NSInteger week = 0; week < weeks.length; week++) {
+	BOOL stop = NO;
+	
+	for (NSInteger week = 0; week < weeks.length && !stop; week++) {
 		dayRect.origin.y = week * self._dayHeight + TUMonthBoundaryLineWidth;
 		
-		while (dayRect.origin.x < self.frame.size.width && day < days.length) {
-			dayBlock(day, dayRect);
+		while (dayRect.origin.x < self.frame.size.width && day.day < days.location + days.length && !stop) {
+			dayBlock(day, dayRect, &stop);
 			dayRect.origin.x += self._dayHeight;
-			day++;
+			day.day++;
 		}
 		
 		dayRect.origin.x = TUMonthLabelWidth;
@@ -438,6 +459,24 @@
 	CGContextStrokePath(context);
 }
 
+- (CGGradientRef)_selectedGradient
+{
+	static CGGradientRef gradient = NULL;
+    if (gradient == NULL) {
+        CGFloat colors[16] = {
+			0.745, 0.855, 0.965, 1.000,
+			0.459, 0.698, 0.929, 1.000,
+            0.196, 0.549, 0.894, 1.000,
+            0.075, 0.459, 0.875, 1.000};
+        CGFloat locations[4] = { 0.000, 1.0/40.0, 0.499, 0.5 };
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        gradient = CGGradientCreateWithColorComponents(colorSpace, colors, locations, 4);
+        CGColorSpaceRelease(colorSpace);
+    }
+	
+    return gradient;
+}
+
 - (void)_drawDays
 {
 	CGContextRef context = UIGraphicsGetCurrentContext();
@@ -445,17 +484,23 @@
 	NSDateComponents *today = [[NSCalendar sharedCalendar] components:NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit fromDate:[NSDate date]];
 	NSDateComponents *month = [[NSCalendar sharedCalendar] components:NSYearCalendarUnit | NSMonthCalendarUnit fromDate:self.month];
 	
-	[self _enumerateDays:^(NSInteger day, CGRect dayRect) {
+	[self _enumerateDays:^(NSDateComponents *day, CGRect dayRect, BOOL *stop) {
 		CGContextSaveGState(context);
 		
-		NSString *dayString = [NSString stringWithFormat:@"%d", day + 1];
+		NSString *dayString = [NSString stringWithFormat:@"%d", day.day];
 		UIColor *textColor;
 		UIColor *shadowColor;
+		CGSize shadowOffset = CGSizeMake(0.0, 1.0);
 		
-		BOOL isToday = month.year == today.year && month.month == today.month && day+1 == today.day;
+		BOOL isToday = month.year == today.year && month.month == today.month && day.day == today.day;
+		BOOL isSelected = [self.calendarView.selectedDay isEqual:day];
 		
 		if (isToday) {
-			[[UIColor colorWithRed:0.455 green:0.537 blue:0.643 alpha:1.000] setFill];
+			if (isSelected) {
+				[[UIColor colorWithRed:0.137 green:0.510 blue:0.886 alpha:1.000] setFill];
+			} else {
+				[[UIColor colorWithRed:0.455 green:0.537 blue:0.643 alpha:1.000] setFill];
+			}
 			CGContextFillRect(context, dayRect);
 			
 			CGContextSaveGState(context);
@@ -471,19 +516,41 @@
 			
 			textColor = [UIColor whiteColor];
 			shadowColor = [UIColor darkGrayColor];
+		} else if (isSelected) {
+			CGContextSaveGState(context);
+			
+			CGContextClipToRect(context, dayRect);
+			
+			CGGradientRef gradient = [self _selectedGradient];
+			CGPoint startPoint = CGPointMake(CGRectGetMidX(dayRect), CGRectGetMinY(dayRect));
+			CGPoint endPoint = CGPointMake(CGRectGetMidX(dayRect), CGRectGetMaxY(dayRect));
+			CGContextDrawLinearGradient(context, gradient, startPoint, endPoint, 0);
+			
+			CGContextRestoreGState(context);
+			
+			[[UIColor colorWithRed:0.165 green:0.212 blue:0.282 alpha:1.000] setStroke];
+			CGContextStrokeRect(context, CGRectInset(dayRect, -0.5, -0.5));
+			
+			textColor = [UIColor whiteColor];
+			shadowColor = [UIColor darkGrayColor];
+			shadowOffset = CGSizeMake(0.0, -1.0);
 		} else {
 			textColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"day-gradient.png"]];
 			shadowColor = [UIColor whiteColor];
 		}
 		
+		
 		CGSize stringSize = [dayString sizeWithFont:[UIFont boldSystemFontOfSize:20.0] constrainedToSize:dayRect.size];
-		dayRect.origin.y += (dayRect.size.height - stringSize.height) / 2.0 + 1.0;
+		dayRect.origin.y += (dayRect.size.height - stringSize.height) / 2.0;
+		dayRect.origin.x += shadowOffset.width;
+		dayRect.origin.y += shadowOffset.height;
 		dayRect.size.height = stringSize.height;
 		
 		[shadowColor set];
 		[dayString drawInRect:dayRect withFont:[UIFont boldSystemFontOfSize:20.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
 		
-		dayRect.origin.y -= 1.0;
+		dayRect.origin.x -= shadowOffset.width;
+		dayRect.origin.y -= shadowOffset.height;
 		[textColor set];
 		CGContextSetPatternPhase(context, CGSizeMake(0.0, dayRect.origin.y));
 		[dayString drawInRect:dayRect withFont:[UIFont boldSystemFontOfSize:20.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];

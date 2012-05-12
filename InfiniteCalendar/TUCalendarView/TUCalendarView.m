@@ -21,6 +21,7 @@
 - (void)_updateHeaderPosition;
 - (void)_updateMonthViews;
 - (TUMonthView *)_dequeueMonthView;
+- (IBAction)_selectionTap:(id)sender;
 
 @end
 
@@ -29,7 +30,40 @@
 	NSMutableArray *_monthViews;
 	NSMutableSet *_monthViewQueue;
 	TUCalendarHeaderView *_headerView;
+	UITapGestureRecognizer *_selectionRecognizer;
 }
+
+#pragma mark - Properties
+
+@synthesize selectedDay = _selectedDay;
+
+- (void)setSelectedDay:(NSDateComponents *)selectedDay
+{
+	[self setSelectedDay:selectedDay animated:NO];
+}
+
+- (void)setSelectedDay:(NSDateComponents *)selectedDay animated:(BOOL)animated
+{
+	_selectedDay = selectedDay;
+	
+	NSTimeInterval duration = 0.0;
+	if (animated) {
+		duration = 0.25;
+	}
+	
+	[_monthViews enumerateObjectsUsingBlock:^(TUMonthView *monthView, NSUInteger idx, BOOL *stop) {
+		[UIView transitionWithView:monthView
+						  duration:duration
+						   options:UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionTransitionCrossDissolve | UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState
+						animations:^{
+							[monthView setNeedsDisplay];
+						}
+						completion:nil];
+	}];
+	
+	NSLog(@"selected day: %@", _selectedDay);
+}
+
 
 #pragma mark - Initialization
 
@@ -95,7 +129,8 @@
 		[self insertSubview:monthView atIndex:0];
 		[_monthViews addObject:monthView];
 		
-		
+		_selectionRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_selectionTap:)];
+		[self addGestureRecognizer:_selectionRecognizer];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			[self scrollToMonth:[NSDate date]];
@@ -127,6 +162,7 @@
 	
 	if (monthView  == nil) {
 		monthView = [[TUMonthView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.frame.size.width, 100.0)];
+		monthView.calendarView = self;
 	} else {
 		[_monthViewQueue removeObject:monthView];
 	}
@@ -277,6 +313,25 @@
 	offset.y += [TUMonthView topOffsetForWidth:self.frame.size.width month:month] + 1.0;
 	
 	[self setContentOffset:offset animated:animated];
+}
+
+
+#pragma mark - Actions
+
+- (IBAction)_selectionTap:(UITapGestureRecognizer *)sender
+{
+	NSLog(@"sender: %@", sender);
+	[_monthViews enumerateObjectsUsingBlock:^(TUMonthView *monthView, NSUInteger idx, BOOL *stop) {
+		if (CGRectContainsPoint(monthView.frame, [sender locationInView:self])) {
+			NSDateComponents *selectedDay = [monthView dayAtPoint:[self convertPoint:[sender locationInView:self] toView:monthView]];
+			
+			if (selectedDay != nil) {
+				[self setSelectedDay:selectedDay animated:YES];
+				
+				*stop = YES;
+			}
+		}
+	}];
 }
 
 @end
